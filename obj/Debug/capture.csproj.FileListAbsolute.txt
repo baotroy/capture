@@ -20,3 +20,14 @@ C:\Users\Baotroy\Downloads\Compressed\capture\capture\obj\Debug\capture.Properti
 C:\Users\Baotroy\Downloads\Compressed\capture\capture\obj\Debug\capture.csproj.GenerateResource.Cache
 C:\Users\Baotroy\Downloads\Compressed\capture\capture\obj\Debug\capture.exe
 C:\Users\Baotroy\Downloads\Compressed\capture\capture\obj\Debug\capture.pdb
+D:\capture\obj\Debug\capture.exe
+D:\capture\obj\Debug\capture.pdb
+D:\capture\bin\Debug\capture.exe
+D:\capture\bin\Debug\capture.pdb
+D:\capture\bin\Debug\Gma.UserActivityMonitor.dll
+D:\capture\bin\Debug\Gma.UserActivityMonitor.pdb
+D:\capture\obj\Debug\capture.csprojResolveAssemblyReference.cache
+D:\capture\obj\Debug\capture.frmClose.resources
+D:\capture\obj\Debug\capture.Form1.resources
+D:\capture\obj\Debug\capture.Properties.Resources.resources
+D:\capture\obj\Debug\capture.csproj.GenerateResource.Cache
