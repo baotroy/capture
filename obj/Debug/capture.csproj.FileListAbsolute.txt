@@ -31,3 +31,4 @@ D:\capture\obj\Debug\capture.frmClose.resources
 D:\capture\obj\Debug\capture.Form1.resources
 D:\capture\obj\Debug\capture.Properties.Resources.resources
 D:\capture\obj\Debug\capture.csproj.GenerateResource.Cache
+D:\capture\bin\Debug\capture.exe.config
